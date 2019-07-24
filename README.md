@@ -57,3 +57,10 @@
    2. ** **test 제출용**
       - user_path: ./res/predict/test.users
       - **output_path: ./res/predict/test.recommend.txt**
+
+## 모델 dev 예상 점수
+~~~
+MAP : 0.097311
+NDCG : 0.187437
+Entropy : 9.790504
+~~~
