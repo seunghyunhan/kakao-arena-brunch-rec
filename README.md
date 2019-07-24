@@ -1,15 +1,16 @@
 # kakao-arena-brunch-rec
 
 ## 모델
-- **매우매우 심플한 모델**을 구성하였습니다.
-- 모델은 1.candidate 선정 / 2.re-rank 순서로 이루어져 있습니다.
+- 주어진 태스크에 잘 맞는 **매우매우 심플한 모델**을 구성하였습니다.
+- 모델은 **1. candidate 선정** / **2. re-rank** 순서로 이루어져 있습니다.
 
-### 1. candidate 문서 선정 
-- 최신 글의 소비가 매우 많음 => 최신 글 위주로 사용자가 많이 쓸 candidate 를 뽑자
+### 1. candidate 선정 
+- 유저의 소비 패턴을 분석해보니 최신 글의 hit ratio 가 매우 높다. => **최신 글 위주로 사용자가 많이 쓸 candidate 를 뽑자**
    - a. [테스트 시작 몇 일 전 ~ 테스트 기간] 동안 작성된 새로운 문서들 중 **유저가 팔로우한 문서**
    - b. [테스트 시작 몇 일 전 ~ 테스트 기간] 동안 작성된 새로운 문서들 중 **유저가 과거에 많이 본 에디터의 문서**
    - c. 유저가 최근에 본 문서 히스토리와 유사한 **doc2vec top-k문서** (모든 기간의 문서)
 - a + b + c 를 모두 candidate 문서로 이용
+- 참고) a 만 이용해도 metric 이 눈에 띄게 좋게 잘 나옴.
 
 ### 2. re-rank
 - **기본적으로 a(중요) > b > c(덜중요) 순서를 유지**하되 
@@ -31,7 +32,7 @@
    - metadata.json
    - predict.tar
    - read.tar
-- 데이터 다운로드 : https://arena.kakao.com/c/2/data
+- 데이터 설명 및 다운로드 : https://arena.kakao.com/c/2/data
 
 ~~~
 ├── inference.py
