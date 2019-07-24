@@ -215,11 +215,11 @@ def main():
             user_most_seen[u] = dict([e for e in sorted(user_most_seen[u].items(), key=lambda k: -k[1])])
             
             
-    tmp_dev = ['./tmp/dev.users.recommend', './tmp/dev.users']
+    #tmp_dev = ['./tmp/dev.users.recommend', './tmp/dev.users']
     dev = ['./res/predict/dev.recommend.txt', './res/predict/dev.users']
     test = ['./res/predict/test.recommend.txt', './res/predict/test.users']
 
-    path_list = [tmp_dev, dev, test]
+    path_list = [dev, test]
     for output_path, user_path in path_list:
 
         print ("Start recommendation!")

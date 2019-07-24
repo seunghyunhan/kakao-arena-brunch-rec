@@ -48,14 +48,10 @@
 	$ python inference.py
 	~~~
 
-
-2. 기본적으로 3개의 user 인풋으로부터 각각의 결과 파일을 만듭니다. **최종 제출 파일은 "./res/predict/test.recommend.txt"** 입니다.
-   1. 자체 테스트용
-      - user_path: ./tmp/dev.users
-      - output_path: ./tmp/dev.users.recommend
-   2. dev 제출용
+2. 기본적으로 2 개의 user 인풋으로부터 각각의 결과 파일을 만듭니다. **최종 제출 파일은 "./res/predict/test.recommend.txt"** 입니다.
+   1. dev 제출용
       - user_path: ./res/predict/dev.users
       - output_path: ./res/predict/dev.recommend.txt
-   3. ** **test 제출용**
+   2. ** **test 제출용**
       - user_path: ./res/predict/test.users
       - **output_path: ./res/predict/test.recommend.txt**
