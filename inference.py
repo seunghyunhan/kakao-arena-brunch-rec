@@ -224,7 +224,7 @@ def main():
 
         print ("Start recommendation!")
         print ("Read data from {}".format(user_path))
-        print ("Write data from {}".format(output_path))    
+        print ("Write data to {}".format(output_path))    
         
         with codecs.open(output_path, mode='w') as w_f:
             with codecs.open(user_path, mode='r') as f:

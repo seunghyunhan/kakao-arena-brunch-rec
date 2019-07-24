@@ -18,12 +18,11 @@
 ├── inference.py
 ├── util.py
 ├── config.py
-├── res
-│   ├── users.json
-│   ├── metadata.json
-│   ├── predict
-│   └── read
-└── tmp
+└── res
+    ├── users.json
+    ├── metadata.json
+    ├── predict
+    └── read
 ~~~
 
 ## 모델
