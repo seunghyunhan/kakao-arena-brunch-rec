@@ -52,19 +52,19 @@
 
 
 ## 실행 방법
-0. train 방법
+1. Train word2vec
 
    ~~~
-   $ python train_w2v.py
+   $ python train.py
    ~~~
-1. Run script.
+2. Run script.
 
 	~~~
 	$ python inference.py
 	~~~
 
 
-2. 아래 2 개의 user 인풋으로부터 각각의 결과 파일을 만듭니다. **최종 제출 파일은 "./res/predict/recommend.txt"** 입니다.
+3. 아래 2 개의 user 인풋으로부터 각각의 결과 파일을 만듭니다. **최종 제출 파일은 "./res/predict/recommend.txt"** 입니다.
    1. dev 제출용
       - user_path: ./res/predict/dev.users
       - output_path: ./res/predict/dev.recommend.txt
