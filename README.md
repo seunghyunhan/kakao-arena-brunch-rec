@@ -23,11 +23,13 @@
 ## Requirements
 - python 3.6
 - numpy
-- gensim
+- tensorflow 1.13.x
 - tqdm
 
+(CPU 환경에서 구현)
+
 ## 파일 구조
-- 아래 데이터만 사용합니다
+- 아래 데이터만 사용.
    - users.json
    - metadata.json
    - predict.tar
@@ -38,7 +40,10 @@
 ├── inference.py
 ├── util.py
 ├── config.py
-└── res
+├── word2vec.py
+├── train_w2v.py
+├── /ckpt
+└── /res
     ├── users.json
     ├── metadata.json
     ├── predict
@@ -47,6 +52,11 @@
 
 
 ## 실행 방법
+0. train 방법
+
+   ~~~
+   $ python train_w2v.py
+   ~~~
 1. Run script.
 
 	~~~
@@ -54,18 +64,18 @@
 	~~~
 
 
-2. 아래 2 개의 user 인풋으로부터 각각의 결과 파일을 만듭니다. **최종 제출 파일은 "./res/predict/test.recommend.txt"** 입니다.
+2. 아래 2 개의 user 인풋으로부터 각각의 결과 파일을 만듭니다. **최종 제출 파일은 "./res/predict/recommend.txt"** 입니다.
    1. dev 제출용
       - user_path: ./res/predict/dev.users
       - output_path: ./res/predict/dev.recommend.txt
    2. ** **test 제출용**
       - user_path: ./res/predict/test.users
-      - **output_path: ./res/predict/test.recommend.txt**
+      - **output_path: ./res/predict/recommend.txt**
 
 
 ## 모델 최종 dev 점수
 ~~~
 MAP : 0.097320 (1)
-NDCG : 0.187413 (6)
-Entropy : 9.789116 (5)
+NDCG : 0.187413 (9)
+Entropy : 9.789116 (10)
 ~~~

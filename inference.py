@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-try:
-    import cPickle
-except ImportError:
-    import pickle as cPickle
-
 import numpy as np
 from tqdm import tqdm
 import codecs
@@ -12,78 +7,9 @@ import json
 from datetime import datetime, timedelta
 from collections import OrderedDict
 
-from gensim.models.word2vec import Word2Vec
-
-from util import iterate_data_files
-
-def ts2time(ts):
-    # ts 를 datetime 으로 변경
-    tmp = datetime.fromtimestamp(ts / 1000)
-    date_time = tmp.strftime("%Y%m%d%H")
-    return int(date_time)
-
-def get_click_dist(date_list, test_days_len, additional_days_len):
-    """
-    테스트 기간 중 어떤 날짜에 작성된 문서가 얼마만큼 사용되는지 대략의 분포를 유추
-    
-    date_list: 테스트 하려는 날짜들 ex) [20190222, 20190221, ..., 20190201]
-    test_days_len: 테스트 날짜로부터 이후 날짜 수 ex) 20
-    additional_days_len: 테스트 날짜로부터 이전 날짜 수 ex) 4
-    """
-    diff = [e for e in reversed(range(test_days_len+1))] + [-(e+1) for e in range(additional_days_len)]
-    
-    dist_map = {}
-    for i in diff:
-        dist_map[i] = 0.0
-
-    print ("Generating doc clicks distributions...")
-
-    for input_date in tqdm(date_list):    
-
-        t_obj = datetime.strptime(input_date, "%Y%m%d")
-        d_obj = t_obj + timedelta(days=1)
-        n_obj = t_obj - timedelta(days=test_days_len)
-        c_obj = n_obj - timedelta(days=additional_days_len)
-
-        test_end_date = d_obj.strftime("%Y%m%d")        
-        test_start_date = n_obj.strftime("%Y%m%d")
-        candidate_date = c_obj.strftime("%Y%m%d")
-
-        test_end_date = int(test_end_date) * 100
-        test_start_date = int(test_start_date) * 100
-        candidate_date = int(candidate_date) * 100
-
-        tmp_new_docs = {}
-        with codecs.open('./res/metadata.json','rU','utf-8') as f:
-            for line in f:
-                j_map = json.loads(line)
-
-                j_map['time'] = ts2time(j_map['reg_ts'])
-                if j_map['time'] < test_end_date and j_map['time'] > candidate_date:
-                    tmp_new_docs[j_map['id']] = j_map
-
-        doc_cnt = {}
-        for path, _ in iterate_data_files(test_start_date, test_end_date):
-            for line in open(path):
-                l = line.strip().split()
-                seen = l[1:]
-
-                for doc in seen:
-                    doc_cnt[doc] = doc_cnt.get(doc, 0) + 1                
-
-        new_doc_hit_cnt = 0
-        new_doc_hit_per_date = {}
-
-        for k, v in doc_cnt.items():
-            if k in tmp_new_docs:
-                new_doc_hit_cnt += v
-                time = tmp_new_docs[k]['time'] // 100
-                new_doc_hit_per_date[time] = new_doc_hit_per_date.get(time, 0) + v
-
-        for i, (k, v) in enumerate(sorted(new_doc_hit_per_date.items(), key=lambda k: -k[0])):
-            dist_map[diff[i]] += 100*v/new_doc_hit_cnt
-            
-    return dist_map
+import tensorflow as tf
+from word2vec import word2vec
+from util import iterate_data_files, ts2time, build_dataset, get_click_dist
 
 def main():
     print ("Start inference!")
@@ -155,13 +81,13 @@ def main():
         cand_doc_writer[k] = [(e[0], int(cand_docs[e[0]]['time'])) for e in sorted(c_v, key=lambda v: v[1])]
         
          
-    #
     user_seen = {}
     user_latest_seen = {}
     user_last_seen = {}
 
     # w2v 에 쓰일 sequences
     seen_seq = []
+    all_articles = []
 
     # test 의 (겹치는)기간 동안의 doc 사용량
     doc_cnt = {}
@@ -174,7 +100,10 @@ def main():
             user = l[0]
             seen = l[1:]
 
-            seen_seq.append(seen)
+            if len(seen) > 1:
+                seen_seq.append(seen)
+            all_articles += seen
+
             user_seen[user] = user_seen.get(user, []) + seen
 
             date_range = path.split("./res/read/")[1]
@@ -195,13 +124,36 @@ def main():
 
     doc_cnt = OrderedDict(sorted(doc_cnt.items(), key=lambda k: -k[1])) 
     pop_list = [k for k, v in doc_cnt.items()][:300]
-        
-    model = Word2Vec(size=128, window=4, sg=1, negative=10, min_count=5)
-    model.build_vocab(seen_seq)
-    print ("Start training...")
-    model.train(seen_seq, total_examples=model.corpus_count, epochs=5)
-    print ("End training!")
+    del doc_cnt
     
+    # word2vec 에 이용하는 데이터 만들기
+    vocabulary_size = len(set(all_articles))
+    _, _, article2idx_map, idx2article_map = \
+        build_dataset(all_articles, seen_seq.copy(), vocabulary_size, min_count=5, skip_window=4)
+    filtered_vocabulary_size = len(article2idx_map)
+    
+    del all_articles
+    del seen_seq
+
+    print ("# of vocabulary : all ({}) -> filtered ({})".format(vocabulary_size, filtered_vocabulary_size))
+
+    batch_size = 128
+    embedding_size = 128
+    num_sampled = 10  
+
+    config = {}
+    config['batch_size'] = batch_size
+    config['embedding_size'] = embedding_size  
+    config['num_sampled'] = num_sampled
+    config['filtered_vocaulary_size'] = filtered_vocabulary_size
+
+    # word2vec ckpt 불러오기    
+    sess = tf.Session() 
+    net = word2vec(sess, config)
+    net.build_model()
+    net.initialize_variables()
+    net.restore_from_checkpoint(ckpt_path="./ckpt/", step=500000, use_latest=True)
+
     user_most_seen = {}
     for u, seen in user_latest_seen.items():
         for doc in seen:
@@ -217,7 +169,7 @@ def main():
             
     #tmp_dev = ['./tmp/dev.users.recommend', './tmp/dev.users']
     dev = ['./res/predict/dev.recommend.txt', './res/predict/dev.users']
-    test = ['./res/predict/test.recommend.txt', './res/predict/test.users']
+    test = ['./res/predict/recommend.txt', './res/predict/test.users']
 
     path_list = [dev, test]
     for output_path, user_path in path_list:
@@ -225,7 +177,26 @@ def main():
         print ("Start recommendation!")
         print ("Read data from {}".format(user_path))
         print ("Write data to {}".format(output_path))    
-        
+    
+        ## word2vec 에 의한 top_n 먼저 계산
+        articles_len = 5
+        positives = []
+        with codecs.open(user_path, mode='r') as f:
+            for idx, line in enumerate(f):
+                u = line.rsplit()[0]
+                
+                pos = [article2idx_map[e] for e in reversed(user_seen.get(u, [])) if e in article2idx_map][:articles_len]
+                remain_len = articles_len - len(pos)
+                pos += [filtered_vocabulary_size for _ in range(remain_len)]
+                positives.append(np.array(pos))
+
+        _, _, top_n_bests = net.most_similar(positives,
+                                    idx2article_map=idx2article_map,
+                                    top_n=300)
+
+        top_n_bests = np.array(top_n_bests)[:, :, 0]
+
+
         with codecs.open(output_path, mode='w') as w_f:
             with codecs.open(user_path, mode='r') as f:
                 for line in tqdm(f):
@@ -273,14 +244,15 @@ def main():
                         most_seen_new_doc = rerank_doc(most_seen_new_doc)
 
 
-                    # 3. word2vec 모델에서 가장 최근에 본 4개 문서와 가장 유사한 문서들을 뽑기
-                    positive_input = [e for e in reversed(user_seen[u]) if e in model][:4]
+                    # 3. word2vec 모델에서 가장 최근에 본 n 개 문서와 가장 유사한 문서들을 뽑기
+                    positive_input = [article2idx_map[e] for e in reversed(user_seen.get(u, [])) if e in article2idx_map][:articles_len]
                     if positive_input:
-                        sim_list = [e[0] for e in model.most_similar(positive_input, topn=300)]
+                        sim_list = list(top_n_bests[idx])
                     else:
                         sim_list = pop_list
 
-                    # 최종 추천
+
+                    # 최종 추천 (1 + 2 + 3)
                     rec_docs = following_doc + most_seen_new_doc + sim_list
                     rec_docs = list(OrderedDict.fromkeys(rec_docs))
 
