@@ -41,7 +41,7 @@
 ├── util.py
 ├── config.py
 ├── word2vec.py
-├── train_w2v.py
+├── train.py
 ├── /ckpt
 └── /res
     ├── users.json
