@@ -71,13 +71,13 @@ class word2vec(object):
         self.sess.run(tf.global_variables_initializer())
         print("Variables initialized.")
     
-    def store_checkpoint(self, ckpt_path="./ckpt/", step=0):
+    def store_checkpoint(self, ckpt_path="./ckpt/", step=500000):
         if not os.path.exists(ckpt_path):
             os.makedirs(ckpt_path)
         
         self.saver.save(self.sess, os.path.join(ckpt_path, 'model.ckpt'), global_step=step)
         
-    def restore_from_checkpoint(self, ckpt_path="./ckpt/", step=0, use_latest=True):
+    def restore_from_checkpoint(self, ckpt_path="./ckpt/", step=500000, use_latest=True):
         latest_ckpt = tf.train.latest_checkpoint(ckpt_path)
         if use_latest:
             target_ckpt = latest_ckpt
@@ -90,7 +90,7 @@ class word2vec(object):
         
     def most_similar(self, positives, idx2article_map, top_n=10):
         feed = {self.multi_articles: positives}
-        print ("Calculate similarities...")
+        print ("Calculating similarities between user history and articles... It will take a few minutes.")
                         
         multi_embs, avg_embs, bests  = self.sess.run([self.multi_embeddings, self.avg_embeddings, self.similarity], feed_dict=feed)
         

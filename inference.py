@@ -168,10 +168,10 @@ def main():
             
             
     #tmp_dev = ['./tmp/dev.users.recommend', './tmp/dev.users']
-    dev = ['./res/predict/dev.recommend.txt', './res/predict/dev.users']
+    #dev = ['./res/predict/dev.recommend.txt', './res/predict/dev.users']
     test = ['./res/predict/recommend.txt', './res/predict/test.users']
 
-    path_list = [dev, test]
+    path_list = [test]
     for output_path, user_path in path_list:
 
         print ("Start recommendation!")
@@ -179,7 +179,7 @@ def main():
         print ("Write data to {}".format(output_path))    
     
         ## word2vec 에 의한 top_n 먼저 계산
-        articles_len = 5
+        articles_len = 4
         positives = []
         with codecs.open(user_path, mode='r') as f:
             for idx, line in enumerate(f):
@@ -199,7 +199,7 @@ def main():
 
         with codecs.open(output_path, mode='w') as w_f:
             with codecs.open(user_path, mode='r') as f:
-                for line in tqdm(f):
+                for idx, line in tqdm(enumerate(f)):
                     u = line.rsplit()[0]
 
                     user_most_seen_map = user_most_seen.get(u, {})

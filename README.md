@@ -21,12 +21,11 @@
 - 문서 리스트 c 는 word2vec skip-gram 을 이용해 만든 문서벡터의 cosine similarity 내림차순으로 rank 함.
 
 ## Requirements
+이 코드는 아래 환경에서 테스트 됨.
 - python 3.6
 - numpy
-- tensorflow 1.13.x
+- tensorflow 1.13.0 (CPU)
 - tqdm
-
-(CPU 환경에서 구현)
 
 ## 파일 구조
 - 아래 데이터만 사용.
@@ -57,6 +56,10 @@
    ~~~
    $ python train.py
    ~~~
+   
+   - 학습 후 모델은 ./ckpt/ 폴더에 저장됨.
+   - Pretrained model (model.ckpt) link : [ckpt](https://drive.google.com/file/d/1_pYCZ62Xh7PdHtHMqe_DLTk0EwVoh8UG/view?usp=sharing)
+
 2. Run script.
 
 	~~~
@@ -64,11 +67,8 @@
 	~~~
 
 
-3. 아래 2 개의 user 인풋으로부터 각각의 결과 파일을 만듭니다. **최종 제출 파일은 "./res/predict/recommend.txt"** 입니다.
-   1. dev 제출용
-      - user_path: ./res/predict/dev.users
-      - output_path: ./res/predict/dev.recommend.txt
-   2. ** **test 제출용**
+3. 아래 user 인풋으로부터 결과 파일을 만듭니다. **최종 제출 파일은 "./res/predict/recommend.txt"** 입니다.
+   - ** **test 제출용**
       - user_path: ./res/predict/test.users
       - **output_path: ./res/predict/recommend.txt**
 

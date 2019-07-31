@@ -108,11 +108,12 @@ def train(args):
     net.build_model()
     net.initialize_variables()
 
+    
     decay_alpha = (args.alpha - args.min_alpha) / args.num_steps
     alpha = args.alpha
+    
     check_step = 10000
     save_step = 100000
-
     average_loss = 0
     t1 = time()
     for step in range(args.num_steps):
@@ -122,11 +123,6 @@ def train(args):
         alpha -= decay_alpha
         average_loss += loss_val
 
-
-        if step % save_step == 0 and step > 0:
-            print ("Store checkpoints at step {}...".format(step))
-            net.store_checkpoint(step=step)
-
         if step % check_step == 0 and step > 0:
             average_loss /= check_step
 
@@ -134,6 +130,10 @@ def train(args):
             print("Average loss at step {}: {:.5} [{:.1f} s]".format(step, average_loss, t2-t1))
             t1 = t2
             average_loss = 0
+
+        if (step % save_step == 0 and step > 0) or step+1 == args.num_steps:
+            print ("Store checkpoints at step {}...".format(step))
+            net.store_checkpoint(step=step)
 
 def main():
     parser = argparse.ArgumentParser()
