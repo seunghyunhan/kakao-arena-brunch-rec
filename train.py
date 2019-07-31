@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-
 import numpy as np
 import random
 import tensorflow as tf
@@ -8,7 +7,6 @@ from tqdm import tqdm
 from time import time
 from collections import deque
 import argparse
-
 
 from util import iterate_data_files, build_dataset
 from word2vec import word2vec
