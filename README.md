@@ -58,7 +58,7 @@
    ~~~
    
    - 학습 후 모델은 ./ckpt/ 폴더에 저장됨.
-   - Pretrained model (model.ckpt) link : [Download ckpt](https://drive.google.com/file/d/1_pYCZ62Xh7PdHtHMqe_DLTk0EwVoh8UG/view?usp=sharing)
+   - ~[Deprecated] Download pretrained model (model.ckpt)~
 
 2. Run script.
 
