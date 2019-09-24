@@ -73,9 +73,10 @@
       - **output_path: ./res/predict/recommend.txt**
 
 
-## 모델 최종 dev 점수
-~~~
-MAP : 0.097320 (1)
-NDCG : 0.187413 (9)
-Entropy : 9.789116 (10)
-~~~
+## [UPDATED] Result 
+- Overall Rank : 2nd Place (Dinner)
+- Final Scores
+   - MAP : 0.111363 (1)
+   - NDCG : 0.207167 (2)
+   - Entropy : 9.8464 (9)
+   - Reference : https://arena.kakao.com/forum/topics/168
